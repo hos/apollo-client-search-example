@@ -17,32 +17,40 @@ const query = gql`
     persons: allPersons(filter: { name_contains: $search }) {
       id
       name
-      height
-      hairColor
     }
   }
 `;
 
 function App() {
   const [search, setSearch] = React.useState("");
-  const { data, loading } = useQuery(query, {
-    variables: {
-      search
-    }
-  });
+  const { data, loading, refetch } = useQuery(query);
 
   if (loading) return "loading";
 
+  function handleChange({ target }) {
+    setSearch(target.value);
+    refetch({ search });
+  }
+  const styles = {
+    div: {
+      display: "flex",
+      "flex-wrap": "wrap"
+    },
+    span: {
+      margin: "2px",
+      "font-size": "11px"
+    }
+  };
   return (
     <div className="App">
-      <input
-        key={"some-key"}
-        value={search}
-        onChange={({ target }) => setSearch(target.value)}
-      />
-      {data.persons.map(c => {
-        return <div>{c.name}</div>;
-      })}
+      <div>
+        <input key={"some-key"} value={search} onChange={handleChange} />
+      </div>
+      <div style={styles.div}>
+        {data.persons.map(c => {
+          return <span style={styles.span}>{c.name}, </span>;
+        })}
+      </div>
     </div>
   );
 }
